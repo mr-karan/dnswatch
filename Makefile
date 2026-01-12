@@ -36,6 +36,9 @@ $(APP_BUNDLE): $(SOURCES)
 	@sed -i '' 's/$$(PRODUCT_NAME)/$(APP_NAME)/g' $(APP_BUNDLE)/Contents/Info.plist
 	@sed -i '' 's/$$(MACOSX_DEPLOYMENT_TARGET)/14.0/g' $(APP_BUNDLE)/Contents/Info.plist
 
+	# Copy app icon
+	@cp DNSWatch/Resources/AppIcon.icns $(APP_BUNDLE)/Contents/Resources/
+
 	@echo "Build complete: $(APP_BUNDLE)"
 
 run: build
