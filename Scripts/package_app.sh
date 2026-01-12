@@ -124,17 +124,17 @@ if command -v dsymutil >/dev/null; then
     (cd "$BUILD_DIR" && zip -r -q "$DSYM_ZIP" "$APP_NAME.dSYM")
 fi
 
-# Sign the app
-if [ "$SIGN_APP" = true ]; then
-    echo "→ Signing app..."
-    if [ "$SIGNING_IDENTITY" = "-" ]; then
-        codesign --force --deep --sign "$SIGNING_IDENTITY" "$APP_BUNDLE"
-    else
-        codesign --force --deep --options runtime --timestamp \
-            --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_BUNDLE"
-    fi
-    echo "✅ Signed"
+# Sign the app (always ad-hoc sign to prevent "damaged" error on macOS)
+echo "→ Signing app..."
+if [ "$SIGN_APP" = true ] && [ "$SIGNING_IDENTITY" != "-" ]; then
+    # Developer ID signing with entitlements
+    codesign --force --deep --options runtime --timestamp \
+        --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_BUNDLE"
+else
+    # Ad-hoc signing (required for macOS to not show "damaged" error)
+    codesign --force --deep --sign - "$APP_BUNDLE"
 fi
+echo "✅ Signed"
 
 # Notarize (if requested and credentials available)
 if [ "$NOTARIZE_APP" = true ]; then
