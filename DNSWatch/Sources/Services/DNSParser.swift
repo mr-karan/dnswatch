@@ -189,9 +189,41 @@ final class DNSParser {
             udpOffset = ipOffset + ipHeaderLength
         } else if ipVersion == 6 {
             // IPv6: 40-byte fixed header, next header at offset 6
-            let nextHeader = bytes[ipOffset + 6]
-            guard nextHeader == 17 else { return nil } // Not UDP (simplified, ignores extension headers)
-            udpOffset = ipOffset + 40
+            // Must chase extension header chain to find UDP
+            guard ipOffset + 40 <= bytes.count else { return nil }
+
+            var nextHeader = bytes[ipOffset + 6]
+            var extOffset = ipOffset + 40
+
+            // Chase extension headers until we find UDP or something unknown
+            // Extension header types that have length field at offset 1
+            let extensionHeaders: Set<UInt8> = [0, 43, 60] // Hop-by-Hop, Routing, Destination
+            let maxHops = 10 // Prevent infinite loop
+
+            for _ in 0 ..< maxHops {
+                if nextHeader == 17 {
+                    // Found UDP
+                    break
+                } else if nextHeader == 44 {
+                    // Fragment header: fixed 8 bytes, next header at offset 0
+                    guard extOffset + 8 <= bytes.count else { return nil }
+                    nextHeader = bytes[extOffset]
+                    extOffset += 8
+                } else if extensionHeaders.contains(nextHeader) {
+                    // Variable-length extension header
+                    guard extOffset + 2 <= bytes.count else { return nil }
+                    let extLen = Int(bytes[extOffset + 1]) * 8 + 8
+                    guard extOffset + extLen <= bytes.count else { return nil }
+                    nextHeader = bytes[extOffset]
+                    extOffset += extLen
+                } else {
+                    // Unknown or unsupported header type (e.g., ESP, AH, No Next Header)
+                    return nil
+                }
+            }
+
+            guard nextHeader == 17 else { return nil } // Never found UDP
+            udpOffset = extOffset
         } else {
             return nil
         }
