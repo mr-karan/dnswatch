@@ -1,0 +1,7 @@
+--indent 4
+--maxwidth 120
+--self insert
+--extensionmark "MARK: - %t + %p"
+--linebreaks lf
+--swiftversion 6.0
+--exclude .build,.swiftpm

@@ -1,0 +1,43 @@
+included:
+  - DNSWatch/Sources
+
+excluded:
+  - .build
+  - .swiftpm
+
+disabled_rules:
+  - trailing_whitespace
+  - indentation_width
+  - identifier_name          # DNS types (A, NS, MX) and C interop names
+  - type_name                # C interop types (pcap_if_t, bpf_program)
+  - cyclomatic_complexity    # Parser functions are inherently complex
+  - trailing_comma           # Conflicts with SwiftFormat
+  - large_tuple              # Used in persistence
+  - nesting                  # Used in persistence structs
+  - opening_brace            # SwiftFormat handles this
+  - multiple_closures_with_trailing_closure  # Common SwiftUI pattern
+  - for_where                # Style preference
+
+opt_in_rules:
+  - array_init
+  - closure_spacing
+  - empty_count
+  - explicit_init
+  - vertical_parameter_alignment_on_call
+  - yoda_condition
+
+line_length:
+  warning: 150
+  error: 300
+
+file_length:
+  warning: 500
+  error: 1000
+
+function_body_length:
+  warning: 150
+  error: 300
+
+type_body_length:
+  warning: 400
+  error: 800

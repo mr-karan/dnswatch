@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.2"/>
+      <stop offset="50%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
+  <circle cx="64" cy="64" r="60" stroke="url(#accent)" stroke-width="2" fill="none" opacity="0.5"/>
+
+  <!-- DNS network nodes -->
+  <circle cx="64" cy="40" r="8" fill="url(#accent)"/>
+  <circle cx="40" cy="72" r="6" fill="url(#accent)" opacity="0.8"/>
+  <circle cx="88" cy="72" r="6" fill="url(#accent)" opacity="0.8"/>
+  <circle cx="52" cy="88" r="4" fill="url(#accent)" opacity="0.6"/>
+  <circle cx="76" cy="88" r="4" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- Connection lines -->
+  <line x1="64" y1="48" x2="40" y2="66" stroke="url(#accent)" stroke-width="2" opacity="0.6"/>
+  <line x1="64" y1="48" x2="88" y2="66" stroke="url(#accent)" stroke-width="2" opacity="0.6"/>
+  <line x1="40" y1="78" x2="52" y2="84" stroke="url(#accent)" stroke-width="1.5" opacity="0.4"/>
+  <line x1="88" y1="78" x2="76" y2="84" stroke="url(#accent)" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Pulse/signal waves -->
+  <path d="M28 64 Q34 54, 40 64 Q46 74, 52 64" stroke="url(#pulse)" stroke-width="2" fill="none"/>
+  <path d="M76 64 Q82 54, 88 64 Q94 74, 100 64" stroke="url(#pulse)" stroke-width="2" fill="none"/>
+
+  <!-- Eye/watch element in center node -->
+  <circle cx="64" cy="40" r="4" fill="#1a1a2e"/>
+  <circle cx="64" cy="40" r="2" fill="#fff"/>
+</svg>

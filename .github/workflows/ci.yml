@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+
+      - name: Install lint tools
+        run: brew install swiftlint swiftformat
+
+      - name: Lint
+        run: make lint
+
+      - name: Build
+        run: make build
