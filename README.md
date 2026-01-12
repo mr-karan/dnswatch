@@ -36,6 +36,17 @@ make build
 
 Grab the latest from [GitHub Releases](https://github.com/mr-karan/dnswatch/releases).
 
+### macOS Security Warning
+
+Since the app isn't signed with an Apple Developer ID, macOS will show a warning. To open:
+
+1. **Right-click** the app → **Open** → **Open** (in the dialog)
+
+Or remove the quarantine flag:
+```bash
+xattr -cr /Applications/DNSWatch.app
+```
+
 ## Setup
 
 DNSWatch needs BPF permissions to capture packets:
