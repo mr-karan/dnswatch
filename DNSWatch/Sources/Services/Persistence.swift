@@ -33,6 +33,10 @@ final class Persistence {
     private var configURL: URL {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appDir = appSupport.appendingPathComponent("DNSWatch", isDirectory: true)
+
+        // Create directory if needed
+        try? FileManager.default.createDirectory(at: appDir, withIntermediateDirectories: true)
+
         return appDir.appendingPathComponent("config.json")
     }
 
