@@ -112,6 +112,9 @@ sed -i '' "s/\$(MACOSX_DEPLOYMENT_TARGET)/14.0/g" "$APP_BUNDLE/Contents/Info.pli
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || \
     /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$APP_BUNDLE/Contents/Info.plist"
 
+# Copy app icon
+cp "$ROOT/DNSWatch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
+
 echo "✅ Build complete"
 
 xattr -cr "$APP_BUNDLE"
