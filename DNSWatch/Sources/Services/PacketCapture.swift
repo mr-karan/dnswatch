@@ -149,11 +149,15 @@ final class PacketCapture {
                 // Timeout, continue
                 continue
             case -1:
-                // Error
+                // Error - clean up and exit
                 if self.isCapturing {
                     let errorMessage = String(cString: pcap_geterr(handle))
                     print("Capture error: \(errorMessage)")
+                    self.isCapturing = false
+                    pcap_close(handle)
+                    self.pcapHandle = nil
                 }
+                return
             case -2:
                 // Breakloop called
                 break

@@ -188,8 +188,9 @@ final class StatsEngine: ObservableObject {
     }
 
     private func updateRateStats() {
-        let oneMinuteAgo = Date().addingTimeInterval(-60)
-        self.queriesLastMinute = self.allQueries.count(where: { $0.timestamp > oneMinuteAgo })
+        // Use timeline bucket for O(1) lookup instead of scanning all queries
+        let currentBucket = self.bucketStartTime(for: Date())
+        self.queriesLastMinute = self.timelineBuckets[currentBucket] ?? 0
     }
 
     private func updateTimelineData() {

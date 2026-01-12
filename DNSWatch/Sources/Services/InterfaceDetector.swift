@@ -90,12 +90,17 @@ enum InterfaceDetector {
             guard let output = String(data: data, encoding: .utf8) else { return nil }
 
             // Parse first nameserver
+            // Format: "  nameserver[0] : 192.168.1.1" or "  nameserver[0] : 2001:4860:4860::8888"
             for line in output.components(separatedBy: "\n") {
                 let trimmed = line.trimmingCharacters(in: .whitespaces)
                 if trimmed.hasPrefix("nameserver[0]") || trimmed.hasPrefix("nameserver :") {
-                    let parts = trimmed.components(separatedBy: ":")
-                    if parts.count >= 2 {
-                        return parts[1].trimmingCharacters(in: .whitespaces)
+                    // Find first " : " separator (handles IPv6 addresses with colons)
+                    if let separatorRange = trimmed.range(of: " : ") {
+                        let address = String(trimmed[separatorRange.upperBound...])
+                            .trimmingCharacters(in: .whitespaces)
+                        if !address.isEmpty {
+                            return address
+                        }
                     }
                 }
             }

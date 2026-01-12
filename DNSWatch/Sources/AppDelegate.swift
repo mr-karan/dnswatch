@@ -35,6 +35,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.activeInterfaces.removeAll()
     }
 
+    /// Check if any capture is currently active
+    private var isAnyCapturing: Bool {
+        self.packetCaptures.contains { $0.capturing }
+    }
+
     // MARK: - Setup
 
     private func setupMenuBar() {
@@ -52,7 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onReset: { [weak self] in self?.resetStats() },
             onToggleCapture: { [weak self] in self?.toggleCapture() },
             isCapturing: { [weak self] in
-                self?.packetCaptures.first?.capturing ?? false
+                self?.isAnyCapturing ?? false
             },
             onQuit: { NSApp.terminate(nil) },
             activeInterfaces: { [weak self] in
@@ -107,7 +112,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Create icon with activity indicator
         let config = NSImage.SymbolConfiguration(pointSize: 16, weight: .medium)
 
-        if self.packetCaptures.isEmpty || self.packetCaptures.first?.capturing != true {
+        if self.packetCaptures.isEmpty || !self.isAnyCapturing {
             // Paused state
             button.image = NSImage(systemSymbolName: "network.slash", accessibilityDescription: "DNS Monitor (Paused)")?
                 .withSymbolConfiguration(config)
@@ -138,7 +143,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if let menu = statusMenu, let button = statusItem?.button {
                 // Update menu item titles
                 if let pauseItem = menu.item(withTitle: "Pause Capture") ?? menu.item(withTitle: "Resume Capture") {
-                    pauseItem.title = (self.packetCaptures.first?.capturing == true) ? "Pause Capture" : "Resume Capture"
+                    pauseItem.title = self.isAnyCapturing ? "Pause Capture" : "Resume Capture"
                 }
                 self.statusItem?.menu = menu
                 button.performClick(nil)
@@ -216,7 +221,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func toggleCapture() {
-        if !self.packetCaptures.isEmpty, self.packetCaptures.first?.capturing == true {
+        if self.isAnyCapturing {
             self.stopAllCaptures()
         } else {
             self.startCapture()
