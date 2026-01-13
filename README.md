@@ -11,7 +11,7 @@
 A privacy-friendly macOS menu bar app that monitors and visualizes DNS queries in real-time. All data stays on your device.
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="DNSWatch Screenshot" width="400">
+  <img src="docs/demo.gif" alt="DNSWatch Demo" width="600">
 </p>
 
 ## Features
