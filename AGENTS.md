@@ -23,7 +23,11 @@ make clean        # Remove build artifacts
 
 **BPF permissions required** for packet capture:
 ```bash
-sudo chmod o+r /dev/bpf*
+# Recommended: install helper (persists across reboots)
+sudo DNSWatch/Resources/BPFHelper/install_bpf_helper.sh
+
+# Temporary: reset on reboot
+sudo chmod o+rw /dev/bpf*
 ```
 
 **Kill running instance**:
@@ -57,6 +61,7 @@ DNSWatch/Sources/
 │   └── DNSQuery.swift        # Query data model, stats structs
 ├── Services/
 │   ├── PacketCapture.swift   # libpcap wrapper (@_silgen_name bindings)
+│   ├── BPFHelperInstaller.swift # Installs helper for BPF permissions
 │   ├── DNSParser.swift       # DNS protocol parser (handles compression)
 │   ├── StatsEngine.swift     # @MainActor stats aggregation
 │   ├── InterfaceDetector.swift # Network interface auto-detection

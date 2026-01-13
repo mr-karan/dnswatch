@@ -8,6 +8,8 @@ struct ContentView: View {
     let isCapturing: () -> Bool
     let onQuit: () -> Void
     let activeInterfaces: () -> [String]
+    let onInstallBPFHelper: () -> Void
+    let onUninstallBPFHelper: () -> Void
 
     @State private var selectedTab = 0
     @State private var showSettings = false
@@ -169,6 +171,33 @@ struct ContentView: View {
                                     .lineLimit(1)
                             }
                             .font(.system(size: 13))
+                        }
+                    }
+
+                    // Capture Permissions Section
+                    SettingsSection(title: "Capture Permissions") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Install the helper to restore BPF permissions at boot.")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 8) {
+                                Button("Install Helper") {
+                                    self.onInstallBPFHelper()
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.small)
+
+                                Button("Remove Helper") {
+                                    self.onUninstallBPFHelper()
+                                }
+                                .buttonStyle(.bordered)
+                                .controlSize(.small)
+                            }
+
+                            Text("You may need to log out and back in after installing.")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.tertiary)
                         }
                     }
 

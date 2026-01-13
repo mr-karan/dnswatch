@@ -77,6 +77,13 @@ update_plist() {
         "$APP_BUNDLE/Contents/Info.plist"
 }
 
+copy_resources() {
+    cp "$ROOT/DNSWatch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
+    mkdir -p "$APP_BUNDLE/Contents/Resources/BPFHelper"
+    cp "$ROOT/DNSWatch/Resources/BPFHelper/"* "$APP_BUNDLE/Contents/Resources/BPFHelper/"
+    chmod +x "$APP_BUNDLE/Contents/Resources/BPFHelper/"*.sh
+}
+
 echo "DNSWatch Development Loop"
 echo "=========================="
 
@@ -90,11 +97,15 @@ echo "→ Building..."
 rm -rf "$BUILD_DIR"
 build_app
 update_plist
+copy_resources
 
-if [ ! -r /dev/bpf0 ]; then
+if [ ! -r /dev/bpf0 ] || [ ! -w /dev/bpf0 ]; then
     echo ""
     echo "BPF permissions required. Run:"
-    echo "  sudo chmod o+r /dev/bpf*"
+    echo "  sudo $ROOT/DNSWatch/Resources/BPFHelper/install_bpf_helper.sh"
+    echo ""
+    echo "Temporary fix:"
+    echo "  sudo chmod o+rw /dev/bpf*"
     echo ""
 fi
 

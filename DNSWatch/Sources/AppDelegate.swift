@@ -62,6 +62,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onQuit: { NSApp.terminate(nil) },
             activeInterfaces: { [weak self] in
                 self?.activeInterfaces ?? []
+            },
+            onInstallBPFHelper: { [weak self] in
+                self?.installBPFHelper()
+            },
+            onUninstallBPFHelper: { [weak self] in
+                self?.uninstallBPFHelper()
             }
         )
 
@@ -239,13 +245,81 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.informativeText = """
         \(error.localizedDescription)
 
-        To capture DNS packets, grant BPF permissions:
-        sudo chmod o+r /dev/bpf*
+        To fix this permanently, install the BPF helper (admin password required once).
+        Temporary fix:
+        sudo chmod o+rw /dev/bpf*
 
         Or run with: sudo \(Bundle.main.executablePath ?? "DNSWatch")
         """
         alert.alertStyle = .warning
+        let isPermissionIssue = self.isPermissionError(error)
+        if isPermissionIssue {
+            alert.addButton(withTitle: "Install Helper")
+            alert.addButton(withTitle: "OK")
+        } else {
+            alert.addButton(withTitle: "OK")
+        }
+        let response = alert.runModal()
+        if isPermissionIssue && response == .alertFirstButtonReturn {
+            self.installBPFHelper()
+        }
+    }
+
+    private func installBPFHelper() {
+        do {
+            try BPFHelperInstaller.install()
+            self.showBPFHelperResult(
+                title: "BPF Helper Installed",
+                message: """
+                DNSWatch will restore BPF permissions at boot.
+                If capture doesn't start immediately, log out and back in.
+                """
+            )
+            if !self.isAnyCapturing {
+                self.startCapture()
+            }
+        } catch {
+            self.showBPFHelperResult(
+                title: "BPF Helper Failed",
+                message: error.localizedDescription
+            )
+        }
+    }
+
+    private func uninstallBPFHelper() {
+        do {
+            try BPFHelperInstaller.uninstall()
+            self.showBPFHelperResult(
+                title: "BPF Helper Removed",
+                message: "BPF permissions will reset on reboot."
+            )
+        } catch {
+            self.showBPFHelperResult(
+                title: "BPF Helper Failed",
+                message: error.localizedDescription
+            )
+        }
+    }
+
+    private func showBPFHelperResult(title: String, message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .informational
         alert.addButton(withTitle: "OK")
         alert.runModal()
+    }
+
+    private func isPermissionError(_ error: Error) -> Bool {
+        guard let captureError = error as? PacketCapture.CaptureError else {
+            return false
+        }
+        switch captureError {
+        case let .openFailed(message):
+            let lowercased = message.lowercased()
+            return lowercased.contains("permission denied") || lowercased.contains("permission")
+        case .filterCompileFailed, .filterSetFailed:
+            return false
+        }
     }
 }

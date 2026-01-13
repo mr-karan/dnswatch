@@ -17,6 +17,11 @@ targets:
     sources:
       - path: DNSWatch/Sources
         type: group
+    resources:
+      - path: DNSWatch/Resources
+        excludes:
+          - Info.plist
+          - DNSWatch.entitlements
     settings:
       base:
         INFOPLIST_FILE: DNSWatch/Resources/Info.plist

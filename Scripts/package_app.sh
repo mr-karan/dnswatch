@@ -114,6 +114,9 @@ sed -i '' "s/\$(MACOSX_DEPLOYMENT_TARGET)/14.0/g" "$APP_BUNDLE/Contents/Info.pli
 
 # Copy app icon
 cp "$ROOT/DNSWatch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
+mkdir -p "$APP_BUNDLE/Contents/Resources/BPFHelper"
+cp "$ROOT/DNSWatch/Resources/BPFHelper/"* "$APP_BUNDLE/Contents/Resources/BPFHelper/"
+chmod +x "$APP_BUNDLE/Contents/Resources/BPFHelper/"*.sh
 
 echo "✅ Build complete"
 
@@ -200,5 +203,6 @@ echo ""
 echo "To install:"
 echo "  1. Open $DIST_DIR/$DMG_NAME"
 echo "  2. Drag $APP_NAME to Applications"
-echo "  3. Run: sudo chmod o+r /dev/bpf*"
+echo "  3. Run: sudo /Applications/$APP_NAME.app/Contents/Resources/BPFHelper/install_bpf_helper.sh"
+echo "     (Temporary: sudo chmod o+rw /dev/bpf*)"
 echo "  4. Launch from Applications"

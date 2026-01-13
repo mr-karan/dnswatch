@@ -49,11 +49,25 @@ xattr -cr /Applications/DNSWatch.app
 
 ## Setup
 
-DNSWatch needs BPF permissions to capture packets:
+DNSWatch needs BPF permissions to capture packets. Recommended (one-time admin prompt):
+
+```bash
+# Install the helper to restore permissions at boot
+sudo /Applications/DNSWatch.app/Contents/Resources/BPFHelper/install_bpf_helper.sh
+```
+
+You can also install the helper from DNSWatch → Settings → Capture Permissions.
+If you're running from source, use:
+
+```bash
+sudo .build/DNSWatch.app/Contents/Resources/BPFHelper/install_bpf_helper.sh
+```
+
+Temporary alternatives:
 
 ```bash
 # Grant permissions (resets on reboot)
-sudo chmod o+r /dev/bpf*
+sudo chmod o+rw /dev/bpf*
 
 # Or run with sudo
 sudo .build/DNSWatch.app/Contents/MacOS/DNSWatch

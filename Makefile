@@ -1,4 +1,4 @@
-.PHONY: build run clean xcode lint format
+.PHONY: build run clean xcode lint format permissions install-helper
 
 # App configuration
 APP_NAME = DNSWatch
@@ -38,13 +38,17 @@ $(APP_BUNDLE): $(SOURCES)
 
 	# Copy app icon
 	@cp DNSWatch/Resources/AppIcon.icns $(APP_BUNDLE)/Contents/Resources/
+	@mkdir -p $(APP_BUNDLE)/Contents/Resources/BPFHelper
+	@cp DNSWatch/Resources/BPFHelper/* $(APP_BUNDLE)/Contents/Resources/BPFHelper/
+	@chmod +x $(APP_BUNDLE)/Contents/Resources/BPFHelper/*.sh
 
 	@echo "Build complete: $(APP_BUNDLE)"
 
 run: build
 	@echo "Running $(APP_NAME)..."
 	@echo "Note: You may need to grant BPF permissions first:"
-	@echo "  sudo chmod o+r /dev/bpf*"
+	@echo "  sudo DNSWatch/Resources/BPFHelper/install_bpf_helper.sh"
+	@echo "  (Temporary: sudo chmod o+rw /dev/bpf*)"
 	@open $(APP_BUNDLE)
 
 run-sudo: build
@@ -80,9 +84,15 @@ xcode:
 
 # Grant BPF permissions (requires sudo)
 permissions:
-	@echo "Granting read permissions to BPF devices..."
-	@sudo chmod o+r /dev/bpf*
+	@echo "Granting temporary permissions to BPF devices..."
+	@sudo chmod o+rw /dev/bpf*
 	@echo "Done. You may need to re-run this after reboot."
+
+# Install BPF helper (requires sudo)
+install-helper:
+	@echo "Installing BPF helper..."
+	@sudo DNSWatch/Resources/BPFHelper/install_bpf_helper.sh
+	@echo "Done. You may need to log out and back in."
 
 help:
 	@echo "DNSWatch Build System"
@@ -96,7 +106,9 @@ help:
 	@echo "  make format      - Auto-format code with swiftformat"
 	@echo "  make xcode       - Generate Xcode project (needs xcodegen)"
 	@echo "  make permissions - Grant BPF device permissions (needs sudo)"
+	@echo "  make install-helper - Install BPF helper (needs sudo)"
 	@echo ""
 	@echo "Before running, you need BPF permissions. Either:"
-	@echo "  1. Run: sudo chmod o+r /dev/bpf*"
-	@echo "  2. Use: make run-sudo"
+	@echo "  1. Run: sudo DNSWatch/Resources/BPFHelper/install_bpf_helper.sh"
+	@echo "  2. Temporary: sudo chmod o+rw /dev/bpf*"
+	@echo "  3. Use: make run-sudo"
