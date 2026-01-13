@@ -77,19 +77,28 @@ Then click the network icon in your menu bar.
 
 ## How It Works
 
+DNSWatch passively captures DNS traffic using macOS's Berkeley Packet Filter (BPF):
+
 ```
-App DNS Query → Network Interface → BPF (/dev/bpf*)
-                                           ↓
-                                ┌────────────────────┐
-                                │      DNSWatch      │
-                                │  libpcap capture   │
-                                │  DNS parser        │
-                                │  Stats engine      │
-                                │  SwiftUI charts    │
-                                └────────────────────┘
+Your App (browser, curl, etc.)
+       ↓
+DNS query to resolver (e.g. 8.8.8.8:53)
+       ↓
+Network stack sends UDP packet
+       ↓
+BPF copies packet to /dev/bpf*  ←──  DNSWatch reads here
+       ↓
+Packet continues to network (unmodified)
 ```
 
-Uses [libpcap](https://www.tcpdump.org/) to capture UDP port 53 traffic, parses DNS protocol to extract domains and query types, aggregates statistics, and displays via Swift Charts.
+**Key components:**
+
+1. **BPF devices** (`/dev/bpf*`) — Kernel-level packet capture points exposed by macOS
+2. **libpcap** — Opens the interface, sets a filter (`udp port 53`), reads packets in a loop
+3. **Interface detection** — Queries `scutil --dns` for active resolver, then `route get` to find which interface (en0, utun3, etc.) carries DNS traffic
+4. **DNS parsing** — Strips Ethernet/IP/UDP headers, parses DNS wire format to extract domain and query type (A, AAAA, MX, etc.)
+
+The app sees a *copy* of packets — it doesn't intercept or modify your traffic.
 
 ## Development
 
