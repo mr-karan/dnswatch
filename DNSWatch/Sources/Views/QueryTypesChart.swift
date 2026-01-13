@@ -3,6 +3,7 @@ import SwiftUI
 
 struct QueryTypesChart: View {
     let stats: [QueryTypeStat]
+    let showEncryptedDNSHint: Bool
 
     private let colors: [Color] = [
         .blue, .green, .orange, .purple, .pink, .cyan, .yellow, .red, .mint, .indigo,
@@ -56,11 +57,13 @@ struct QueryTypesChart: View {
                 .font(.system(size: 36))
                 .foregroundStyle(.tertiary)
 
-            Text("No DNS queries yet")
+            Text(self.showEncryptedDNSHint ? "No UDP/53 traffic" : "No DNS queries yet")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
 
-            Text("Query type distribution will appear here")
+            Text(self.showEncryptedDNSHint
+                 ? "Encrypted DNS (DoH/DoT) is hidden from capture"
+                 : "Query type distribution will appear here")
                 .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
         }

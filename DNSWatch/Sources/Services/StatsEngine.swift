@@ -13,6 +13,9 @@ final class StatsEngine: ObservableObject {
     @Published private(set) var queryTypeStats: [QueryTypeStat] = []
     @Published private(set) var timelineData: [TimelineBucket] = []
     @Published private(set) var recentQueries: [DNSQuery] = []
+    @Published private(set) var lastQueryAt: Date?
+    @Published private(set) var captureStartedAt: Date?
+    @Published private(set) var captureUptime: TimeInterval = 0
 
     // MARK: - Private Properties
 
@@ -55,6 +58,7 @@ final class StatsEngine: ObservableObject {
     func recordQuery(_ query: DNSQuery) {
         self.allQueries.append(query)
         self.totalQueries += 1
+        self.lastQueryAt = query.timestamp
 
         // Update domain counts
         let domain = query.baseDomain
@@ -112,6 +116,15 @@ final class StatsEngine: ObservableObject {
         self.persistence.saveConfig()
     }
 
+    func setCaptureActive(_ isActive: Bool) {
+        if isActive {
+            self.captureStartedAt = Date()
+        } else {
+            self.captureStartedAt = nil
+            self.captureUptime = 0
+        }
+    }
+
     // MARK: - Private Methods
 
     private func loadPersistedData() {
@@ -134,6 +147,7 @@ final class StatsEngine: ObservableObject {
 
         // Update recent queries (most recent first)
         self.recentQueries = Array(queries.sorted { $0.timestamp > $1.timestamp }.prefix(self.maxRecentQueries))
+        self.lastQueryAt = self.recentQueries.first?.timestamp
 
         // Update derived stats
         self.updateDerivedStats()
@@ -191,6 +205,17 @@ final class StatsEngine: ObservableObject {
         // Use timeline bucket for O(1) lookup instead of scanning all queries
         let currentBucket = self.bucketStartTime(for: Date())
         self.queriesLastMinute = self.timelineBuckets[currentBucket] ?? 0
+        self.updateCaptureUptime()
+    }
+
+    private func updateCaptureUptime() {
+        guard let startTime = self.captureStartedAt else {
+            if self.captureUptime != 0 {
+                self.captureUptime = 0
+            }
+            return
+        }
+        self.captureUptime = Date().timeIntervalSince(startTime)
     }
 
     private func updateTimelineData() {

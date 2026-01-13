@@ -3,6 +3,7 @@ import SwiftUI
 
 struct TimelineChart: View {
     let data: [TimelineBucket]
+    let showEncryptedDNSHint: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -81,11 +82,13 @@ struct TimelineChart: View {
                 .font(.system(size: 36))
                 .foregroundStyle(.tertiary)
 
-            Text("No DNS queries yet")
+            Text(self.showEncryptedDNSHint ? "No UDP/53 traffic" : "No DNS queries yet")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
 
-            Text("Activity timeline will appear here")
+            Text(self.showEncryptedDNSHint
+                 ? "Encrypted DNS (DoH/DoT) is hidden from capture"
+                 : "Activity timeline will appear here")
                 .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
         }

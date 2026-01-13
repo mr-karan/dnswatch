@@ -3,6 +3,7 @@ import SwiftUI
 
 struct TopDomainsChart: View {
     let domains: [DomainStat]
+    let showEncryptedDNSHint: Bool
 
     private let maxDomainsToShow = 20
 
@@ -38,11 +39,13 @@ struct TopDomainsChart: View {
                 .font(.system(size: 36))
                 .foregroundStyle(.tertiary)
 
-            Text("No DNS queries yet")
+            Text(self.showEncryptedDNSHint ? "No UDP/53 traffic" : "No DNS queries yet")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
 
-            Text("Queries will appear as they're captured")
+            Text(self.showEncryptedDNSHint
+                 ? "Encrypted DNS (DoH/DoT) is hidden from capture"
+                 : "Queries will appear as they're captured")
                 .font(.system(size: 11))
                 .foregroundStyle(.tertiary)
         }

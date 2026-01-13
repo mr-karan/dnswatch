@@ -33,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         self.packetCaptures.removeAll()
         self.activeInterfaces.removeAll()
+        self.statsEngine.setCaptureActive(false)
     }
 
     /// Check if any capture is currently active
@@ -223,6 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.showCaptureError(error)
         }
 
+        self.statsEngine.setCaptureActive(startedAny)
         self.updateStatusIcon(queryRate: 0)
     }
 

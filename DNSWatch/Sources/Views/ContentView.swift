@@ -28,6 +28,12 @@ struct ContentView: View {
 
     // MARK: - Main View
 
+    private var shouldShowEncryptedDNSHint: Bool {
+        return self.isCapturing() &&
+               self.statsEngine.totalQueries == 0 &&
+               self.statsEngine.captureUptime >= 20
+    }
+
     private var mainView: some View {
         VStack(spacing: 0) {
             // Header
@@ -58,11 +64,20 @@ struct ContentView: View {
             Group {
                 switch self.selectedTab {
                 case 0:
-                    TopDomainsChart(domains: self.statsEngine.topDomains)
+                    TopDomainsChart(
+                        domains: self.statsEngine.topDomains,
+                        showEncryptedDNSHint: self.shouldShowEncryptedDNSHint
+                    )
                 case 1:
-                    QueryTypesChart(stats: self.statsEngine.queryTypeStats)
+                    QueryTypesChart(
+                        stats: self.statsEngine.queryTypeStats,
+                        showEncryptedDNSHint: self.shouldShowEncryptedDNSHint
+                    )
                 case 2:
-                    TimelineChart(data: self.statsEngine.timelineData)
+                    TimelineChart(
+                        data: self.statsEngine.timelineData,
+                        showEncryptedDNSHint: self.shouldShowEncryptedDNSHint
+                    )
                 default:
                     EmptyView()
                 }
